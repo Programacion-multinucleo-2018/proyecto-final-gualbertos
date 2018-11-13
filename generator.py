@@ -1,7 +1,7 @@
 import numpy
 from numpy.random import random_integers as rand
 
-def maze(width=81, height=51, complexity=.75, density=.75):
+def maze(width=15, height=15, complexity=.75, density=.75):
     # Open the file where the maze is to be saved
     f = open("python-generated-maze.txt","w+")
     # First line is maze size
@@ -44,4 +44,4 @@ def maze(width=81, height=51, complexity=.75, density=.75):
     f.close()
     return Z
 
-maze(80, 40);
+maze(16, 16);

@@ -68,14 +68,14 @@ struct Matrix {
     } 
 };
 
-void expandNodeDir(short dir, Node currentNode, short finalX, short finalY, vector<Node> &closedSet, vector<Node> &openSet, map<string, string> &cameFrom) {
+void expandNodeDir(short dir, Node currentNode, short finalX, short finalY, vector<Node> &closedSet, vector<Node> &openSet, map<string, string> &cameFrom, Matrix maze) {
     Node tempNode;
     //Calcular el costo de la heuristica dada
     float distanceFinal;
     // UP
     if (dir == 0) {
         distanceFinal = sqrt(pow(finalX - currentNode.x-1, 2) + pow(finalY - currentNode.y, 2));
-        tempNode.setNode(currentNode.x+1, currentNode.y, distanceFinal, currentNode.cost + 1);
+        tempNode.setNode(currentNode.x-1, currentNode.y, distanceFinal, currentNode.cost + 1);
     }
     // Down
     else if (dir == 1) {
@@ -92,6 +92,7 @@ void expandNodeDir(short dir, Node currentNode, short finalX, short finalY, vect
         distanceFinal = sqrt(pow(finalX - currentNode.x, 2) + pow(finalY - currentNode.y+1, 2));
         tempNode.setNode(currentNode.x, currentNode.y+1, distanceFinal, currentNode.cost + 1);
     }
+    // cout << maze(tempNode.x, tempNode.y) << endl;
     bool visitedFlag = false;
     for(int i = 0; i < closedSet.size(); i++) {
         if(closedSet[i].x == tempNode.x && closedSet[i].y == tempNode.y) {
@@ -132,19 +133,19 @@ void expandNode(Node currentNode, vector<Node> &openSet, vector<Node> &closedSet
     //Down
     // Si no esta esta hasta abajo y abajo no es 1
     if(currentNode.x != (maze.rows - 1) && maze(currentNode.x+1, currentNode.y) != 1 ) {
-        expandNodeDir(1, currentNode, finalX, finalY, closedSet, openSet, cameFrom);
+        expandNodeDir(1, currentNode, finalX, finalY, closedSet, openSet, cameFrom, maze);
     }
     // Up
     else if(currentNode.x != 0 && maze(currentNode.x-1, currentNode.y) != 1 ) { //Si no esta esta hasta arriba y arriba no es 1
-        expandNodeDir(0, currentNode, finalX, finalY, closedSet, openSet, cameFrom);
+        expandNodeDir(0, currentNode, finalX, finalY, closedSet, openSet, cameFrom, maze);
     }
     // Right
     if(currentNode.y != (maze.cols-1) && maze(currentNode.x, currentNode.y+1) != 1 ) { //Si no esta hasta la derecha y derecha no es 1
-        expandNodeDir(2, currentNode, finalX, finalY, closedSet, openSet, cameFrom);
+        expandNodeDir(2, currentNode, finalX, finalY, closedSet, openSet, cameFrom, maze);
     }
     // Left
     if(currentNode.y != 0 && maze(currentNode.x, currentNode.y-1) != 1 ) { //Si no esta hasta la izquierda e izquierda no es 1
-        expandNodeDir(3, currentNode, finalX, finalY, closedSet, openSet, cameFrom);
+        expandNodeDir(3, currentNode, finalX, finalY, closedSet, openSet, cameFrom, maze);
     }
 }
 
@@ -235,7 +236,7 @@ void aStarSearch(Matrix maze, short initialX, short initialY, short finalX, shor
 
 int main(int argc, char * argv[]) {
     //Tenemos por default el nombre del txt
-    char * mazeText = "react/public/python-generated-maze.txt";
+    char * mazeText = "public/python-generated-maze.txt";
 
     if(argc == 2) { //Si nos dieron los file names
         mazeText = argv[1];
