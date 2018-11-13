@@ -1,10 +1,10 @@
 import React from 'react';
 
-const mazeFile = './mazes/generated-maze.txt';
-const solutionFile = './solutions/generated-solution.txt';
-const tick = 500; // ms
-const jump = 1; // steps/tick
-const separator = '';
+const mazeFile = 'python-generated-maze.txt';
+const solutionFile = 'solution.txt';
+const tick = 200; // ms
+const jump = 2; // steps/tick
+const separator = ' ';
 
 export default class App extends React.Component {
     constructor(props) {
@@ -36,7 +36,7 @@ export default class App extends React.Component {
                     let start = {};
                     let end = {};
                     rawFile.responseText.split("\n").forEach((line, index) => {
-                        let [x, y] = line.split(" ");
+                        let [x, y] = line.split(separator);
                         x = parseInt(x, 10);
                         y = parseInt(y, 10);
                         if (index === 0) {
@@ -83,10 +83,7 @@ export default class App extends React.Component {
 
                     rawFile.responseText.split("\n").reverse().forEach((line) => {
                         if (line) {
-                            console.log('line:', line);
                             let [x, y] = line.split("-");
-                            console.log('x:', x);
-                            console.log('y:', y);
                             x = parseInt(x, 10);
                             y = parseInt(y, 10);
                             counter += 1;
@@ -119,6 +116,7 @@ export default class App extends React.Component {
         checkY.forEach((_y) => {
             checkX.forEach((_x) => neighbours.push({ y: y + _y, x: x + _x }));
         });
+        console.log({ x, y, neighbours });
         return neighbours;
     }
 
@@ -134,6 +132,8 @@ export default class App extends React.Component {
         clearInterval(this.interval);
         const { x, y } = this.state.mazeSize;
         const newMaze = JSON.parse(JSON.stringify(this.state.maze));
+
+        // Segundos después de terminar de recorrer el maze, mostramos todo el maze
         setTimeout(() => {
             for (let i = 0; i < y; i += 1) {
                 for (let j = 0; j < x; j += 1) {
