@@ -224,13 +224,18 @@ void aStarSearch(Matrix maze, short initialX, short initialY, short finalX, shor
     // Si no encontramos solución, vemos cuál fue el nodo que más se acercó (el de mejor heurística)
     // Y regresamos el path para ese
     if (!foundSoultion) {
-        Node lowestHeuristicNode = closedSet[0];
+        Node lowestHeuristicNode;
+        lowestHeuristicNode.copyNode(closedSet[0]);
         for(int i = 1; i < closedSet.size(); i++) {
             cout << "closedSet[i].heuristic" << closedSet[i].heuristic << endl;
-            if (lowestHeuristicNode.heuristic < closedSet[i].heuristic) {
+            if (lowestHeuristicNode.heuristic > closedSet[i].heuristic) {
                 lowestHeuristicNode.copyNode(closedSet[i]);
             }
         }
+        ofstream myfile;
+        myfile.open ("public/solution.txt");
+        myfile << findPath(lowestHeuristicNode, cameFrom);
+        myfile.close();
     }
 }
 
