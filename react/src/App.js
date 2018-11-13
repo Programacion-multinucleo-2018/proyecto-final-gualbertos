@@ -2,8 +2,8 @@ import React from 'react';
 
 const mazeFile = 'python-generated-maze.txt';
 const solutionFile = 'solution.txt';
-const tick = 200; // ms
-const jump = 2; // steps/tick
+const tick = 400; // ms
+const jump = 1; // steps/tick
 const separator = ' ';
 
 export default class App extends React.Component {
@@ -87,11 +87,11 @@ export default class App extends React.Component {
                             x = parseInt(x, 10);
                             y = parseInt(y, 10);
                             counter += 1;
-                            newMaze[y][x].step = counter;
-                            newMaze[y][x].solution = true;
+                            newMaze[x][y].step = counter;
+                            newMaze[x][y].solution = true;
                             const possibleNeighbours = this.getPossibleNeighbours(y, x);
                             possibleNeighbours.forEach(({ x, y }) => {
-                                if (!newMaze[y][x].step) newMaze[y][x].step = counter;
+                                if (!newMaze[x][y].step) newMaze[x][y].step = counter;
                             });
                         }
                     });

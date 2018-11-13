@@ -1,16 +1,19 @@
 import numpy
 from numpy.random import random_integers as rand
-import matplotlib.pyglot as pyglot
 
-def maze(width=81, height=51, complexity=.75, density=.75):
+def maze(width=15, height=15, complexity=.75, density=.75):
+    startingX = 1
+    startingY = 1
+    endingX = width - 1
+    endingY = height - 1
     # Open the file where the maze is to be saved
     f = open("public/python-generated-maze.txt","w+")
     # First line is maze size
     f.write("%d %d\n" %(width+1, height+1))
     # Second line is starting point
-    f.write("%d %d\n" %(1, 1))
+    f.write("%d %d\n" %(startingX, startingY))
     # Third line is ending point
-    f.write("%d %d\n" %(width-1, height-1))
+    f.write("%d %d\n" %(endingX, endingY))
     # Only odd shapes
     shape = ((height // 2) * 2 + 1, (width // 2) * 2 + 1)
     # Adjust complexity and density relative to maze size
@@ -45,7 +48,4 @@ def maze(width=81, height=51, complexity=.75, density=.75):
     f.close()
     return Z
 
-pyglot.figure(figsize=(10, 5))
-pyglot.imshow(maze(80, 40), cmap=pyglot.cm.binary, interpolation='nearest')
-pyglot(xticks([])), pyglot.yticks([])
-pyglot.show()
+maze(50, 50);
