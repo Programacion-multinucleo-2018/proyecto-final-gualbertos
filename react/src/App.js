@@ -2,7 +2,7 @@ import React from 'react';
 
 const mazeFile = 'python-generated-maze.txt';
 const solutionFile = 'solution.txt';
-const tick = 400; // ms
+const tick = 100; // ms
 const jump = 1; // steps/tick
 const separator = ' ';
 
@@ -54,6 +54,7 @@ export default class App extends React.Component {
                         }));
                     });
                     // Agregamos el end
+                    // console.log(end);
                     maze[end.y][end.x].end = true;
                     this.setState({ maze, mazeSize, size, start, end }, () => {
                         this.readSolution(solutionFile);
@@ -116,7 +117,7 @@ export default class App extends React.Component {
         checkY.forEach((_y) => {
             checkX.forEach((_x) => neighbours.push({ y: y + _y, x: x + _x }));
         });
-        console.log({ x, y, neighbours });
+        // console.log({ x, y, neighbours });
         return neighbours;
     }
 
@@ -181,7 +182,7 @@ export default class App extends React.Component {
     }
 
     render() {
-        console.log(this.state);
+        // console.log(this.state);
         return (
             <div>
                 {this.state.ready ? this.renderMaze() : null}
