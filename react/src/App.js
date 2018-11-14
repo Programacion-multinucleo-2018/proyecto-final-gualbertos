@@ -142,7 +142,7 @@ export default class App extends React.Component {
                 }
             }
             this.setState({ maze: newMaze });
-        }, 3000);
+        }, 1500);
     }
 
 

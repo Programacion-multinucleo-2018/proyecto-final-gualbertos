@@ -12,7 +12,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "generate": "python generator.py && ./mazeSolver"
+    "generate": "rm public/python-generated-maze.txt && rm public/solution.txt && python generator.py && ./mazeSolver"
   },
   "eslintConfig": {
     "extends": "react-app"
