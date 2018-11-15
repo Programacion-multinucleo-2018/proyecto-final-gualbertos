@@ -57,15 +57,11 @@ struct Matrix {
     short rows;
     short cols;
     vector<short> data;
-    Matrix(short rows_, short cols_):rows(rows_), cols(cols_), data(rows*cols) {
-
-    }
-    short & operator()(size_t row, size_t col)
-    {
+    Matrix(short rows_, short cols_):rows(rows_), cols(cols_), data(rows*cols) { }
+    short & operator()(size_t row, size_t col) {
         return data[row*cols+col];
     } 
-    short operator()(size_t row, size_t col) const
-    {
+    short operator()(size_t row, size_t col) const {
         return data[row*cols+col];
     } 
 };
@@ -74,7 +70,6 @@ struct Matrix {
 bool sortQueue (Node a, Node b) { return (a.score < b.score); }
 
 string findPath(Node currentNode, map<string, string> &cameFrom) {
-    //Definicion de string temporal
     string key = to_string(currentNode.x) + "-" + to_string(currentNode.y);
     string value = cameFrom[key];
     string path = key + "\n";
@@ -84,18 +79,21 @@ string findPath(Node currentNode, map<string, string> &cameFrom) {
         key = value;
         value = cameFrom[key];
     }
-
-    /* cout << path << endl; */
     return path;
 }
 
 short isInSet(Node node, vector<Node> &set) {
     for (int i = 0; i < set.size(); i++) {
-        if (node.x == set[i].x && node.y == set[i].y) {
-            return i;                        
-        }
+        if (node.x == set[i].x && node.y == set[i].y) return i;
     }
     return -1;
+}
+
+void checkNeighbour(vector<Node> &tempNodes, Matrix maze, short x, short y, short finalX, short finalY, short cost) {
+    float distance = sqrt(pow(finalX - x, 2) + pow(finalY - y, 2));
+    if (maze(y, x) != 1) {
+        tempNodes.push_back(*new Node(x, y, distance, cost));
+    }
 }
 
 void expandNode(Node currentNode, vector<Node> &openSet, vector<Node> &closedSet, map<string, string> &cameFrom, Matrix maze, short finalX, short finalY) {
@@ -106,40 +104,28 @@ void expandNode(Node currentNode, vector<Node> &openSet, vector<Node> &closedSet
     // Left
     short _x = x - 1;
     short _y = y;
-    float distance = sqrt(pow(finalX - _x, 2) + pow(finalY - _y, 2));
-    if (maze(_y, _x) != 1) {
-        tempNodes.push_back(*new Node(_x, _y, distance, cost));
-    }
+    checkNeighbour(tempNodes, maze, _x, _y, finalX, finalY, cost);
     // Right
     _x = x + 1;
     _y = y;
-    distance = sqrt(pow(finalX - _x, 2) + pow(finalY - _y, 2));
-    if (maze(y, x + 1) != 1) {
-        tempNodes.push_back(*new Node(_x, _y, distance, cost));
-    }
+    checkNeighbour(tempNodes, maze, _x, _y, finalX, finalY, cost);
     // Up
     _x = x;
     _y = y - 1;
-    distance = sqrt(pow(finalX - _x, 2) + pow(finalY - _y, 2));
-    if (maze(_y, _x) != 1) {
-        tempNodes.push_back(*new Node(_x, _y, distance, cost));
-    }
+    checkNeighbour(tempNodes, maze, _x, _y, finalX, finalY, cost);
     // Down
     _x = x;
     _y = y + 1;
-    distance = sqrt(pow(finalX - _x, 2) + pow(finalY - _y, 2));
-    if (maze(_y, _x) != 1) {
-        tempNodes.push_back(*new Node(_x, _y, distance, cost));
-    }
+    checkNeighbour(tempNodes, maze, _x, _y, finalX, finalY, cost);
 
     // Checamos cada vecino
     for (int i = 0; i < tempNodes.size(); i++) {
         // Si está en el closed set, no hacemos nada con el nodo
         if (isInSet(tempNodes[i], closedSet) > -1) continue;
         short index = isInSet(tempNodes[i], openSet);
-        if (index == -1) { // Si no está en openSet
+        if (index == -1) { // Si no está en openSet lo metemos a openSet
             openSet.push_back(tempNodes[i]);
-        } else {
+        } else { // si sí está en openSet, checamos si llegamos con mejor score y lo actualizamos
             if (tempNodes[i].score >= currentNode.score) continue;
             openSet[index].updateCost(tempNodes[i].cost);
         }
