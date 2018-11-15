@@ -41,6 +41,7 @@ def maze(width=15, height=15, complexity=.75, density=.75):
     # Empezar el finalX, finalY randomizado
     finalX = height - 1
     finalY = width - 1
+    print("maze Size %d, %d" % (width, height))
     print("finalX %d, finalY %d" % (finalX, finalY))
     # while(Z[finalX, finalY] == 1):
     #     finalX = random.randint(0, height)
@@ -55,4 +56,4 @@ def maze(width=15, height=15, complexity=.75, density=.75):
     f.close()
     return Z
 
-maze(20, 20);
+maze(140, 140);

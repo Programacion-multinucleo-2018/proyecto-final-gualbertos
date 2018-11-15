@@ -10,9 +10,8 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "generate": "rm public/python-generated-maze.txt && rm public/solution.txt && python generator.py && ./mazeSolver"
+    "generate": "rm public/python-generated-maze.txt && rm public/solution.txt && python generator.py && ./gualSolver"
   },
   "eslintConfig": {
     "extends": "react-app"

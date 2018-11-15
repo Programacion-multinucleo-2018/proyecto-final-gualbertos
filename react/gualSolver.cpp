@@ -1,12 +1,11 @@
-#include <stdio.h>
-#include <stdlib.h>
+/* #include <stdlib.h> */
 #include <math.h>
 #include <iostream>
 #include <fstream>
 #include <vector>
 #include <map>
-#include <algorithm>
-#include <list>
+/* #include <algorithm> */
+/* #include <list> */
 
 using namespace std;
 
@@ -86,9 +85,7 @@ string findPath(Node currentNode, map<string, string> &cameFrom) {
         value = cameFrom[key];
     }
 
-    cout << "path:" << endl;
-    cout << path << endl;
-
+    /* cout << path << endl; */
     return path;
 }
 
@@ -106,58 +103,50 @@ void expandNode(Node currentNode, vector<Node> &openSet, vector<Node> &closedSet
     short x = currentNode.x;
     short y = currentNode.y;
     short cost = currentNode.cost + 1;
-    cout << "current node x:" << x << " y: " << y << endl;
     // Left
-    cout << "x: " << x - 1 << " y: " << y << endl;
-    cout << maze(y, x - 1) << endl;
-    if (maze(y, x - 1) != 1) {
-        tempNodes.push_back(*new Node(x - 1, y, sqrt(pow(finalX - x - 1, 2) + pow(finalY - y, 2)), cost));
-        // TODO: Aquí se me hace que lo tenemos que meter el score al map de scores
+    short _x = x - 1;
+    short _y = y;
+    float distance = sqrt(pow(finalX - _x, 2) + pow(finalY - _y, 2));
+    if (maze(_y, _x) != 1) {
+        tempNodes.push_back(*new Node(_x, _y, distance, cost));
     }
     // Right
-    cout << "x: " << x + 1 << " y: " << y << endl;
-    cout << maze(y, x + 1) << endl;
+    _x = x + 1;
+    _y = y;
+    distance = sqrt(pow(finalX - _x, 2) + pow(finalY - _y, 2));
     if (maze(y, x + 1) != 1) {
-        float distanceFinal = sqrt(pow(finalX - x + 1, 2) + pow(finalY - y, 2));
-        Node tempNode (x + 1, y, distanceFinal, cost);
-        // expandNodeDir(tempNode);
-        // TODO: este pedo no funciona para 3-1 que es un 0
-        // tempNodes.push_back(*new Node());
+        tempNodes.push_back(*new Node(_x, _y, distance, cost));
     }
     // Up
-    cout << "x: " << x  << " y: " << y - 1 << endl;
-    cout << maze(y - 1, x) << endl;
-    if (maze(y - 1, x) != 1) {
-        float distanceFinal = sqrt(pow(finalX - x, 2) + pow(finalY - y - 1, 2));
-        tempNodes.push_back(*new Node(x, y - 1, distanceFinal, cost));
+    _x = x;
+    _y = y - 1;
+    distance = sqrt(pow(finalX - _x, 2) + pow(finalY - _y, 2));
+    if (maze(_y, _x) != 1) {
+        tempNodes.push_back(*new Node(_x, _y, distance, cost));
     }
     // Down
-    cout << "x: " << x  << " y: " << y + 1 << endl;
-    cout << maze(y + 1, x) << endl;
-    if (maze(y + 1, x) != 1) {
-        float distanceFinal = sqrt(pow(finalX - x, 2) + pow(finalY - y + 1, 2));
-        tempNodes.push_back(*new Node(x, y + 1, distanceFinal, cost));
+    _x = x;
+    _y = y + 1;
+    distance = sqrt(pow(finalX - _x, 2) + pow(finalY - _y, 2));
+    if (maze(_y, _x) != 1) {
+        tempNodes.push_back(*new Node(_x, _y, distance, cost));
     }
-    cout << "endendendendendend\n\n" << endl;
 
     // Checamos cada vecino
-    cout << "temp nodes" << endl;
     for (int i = 0; i < tempNodes.size(); i++) {
-        tempNodes[i].printMe();
-        // Checamos si está en closedSet
-        if (isInSet(tempNodes[i], closedSet) > -1) break;
+        // Si está en el closed set, no hacemos nada con el nodo
+        if (isInSet(tempNodes[i], closedSet) > -1) continue;
         short index = isInSet(tempNodes[i], openSet);
-        if (index == -1) { // Si no setá en openSet
+        if (index == -1) { // Si no está en openSet
             openSet.push_back(tempNodes[i]);
         } else {
-            if (tempNodes[i].score >= currentNode.score) break;
-            string key = to_string(tempNodes[i].x) + "-" + to_string(tempNodes[i].y);
-            string value = to_string(x) + "-" + to_string(y);
-            cameFrom[key] = value;
+            if (tempNodes[i].score >= currentNode.score) continue;
             openSet[index].updateCost(tempNodes[i].cost);
         }
+        string key = to_string(tempNodes[i].x) + "-" + to_string(tempNodes[i].y);
+        string value = to_string(x) + "-" + to_string(y);
+        cameFrom[key] = value;
     }
-    cout << "===========\n\n" << endl;
 }
 
 void aStarSearch(Matrix maze, short initialX, short initialY, short finalX, short finalY) {
@@ -186,10 +175,10 @@ void aStarSearch(Matrix maze, short initialX, short initialY, short finalX, shor
         // Sorteamos los nodos dependiendo del score
         sort(openSet.begin(), openSet.end(), sortQueue);
         Node currentNode = openSet.front();
-        // cout << currentNode.x << " , " << currentNode.y << endl;
 
         // Checamos si llegamos al goal
         if (currentNode.x == finalX && currentNode.y == finalY) {
+            cout << "solution found" << endl;
             foundSoultion = true;
             ofstream myfile;
             myfile.open ("public/solution.txt");
@@ -238,12 +227,12 @@ int main(int argc, char * argv[]) {
     }
 
     //Debug print
-    for(int i = 0; i < maze.rows; i++) {
-        for(int j = 0; j < maze.cols; j++) {
-            cout << maze(i, j) << " ";
-        }
-        cout << endl;
-    }
+    /* for(int i = 0; i < maze.rows; i++) { */
+    /*     for(int j = 0; j < maze.cols; j++) { */
+    /*         cout << maze(i, j) << " "; */
+    /*     } */
+    /*     cout << endl; */
+    /* } */
 
     aStarSearch(maze, initialX, initialY, finalX, finalY);
     return 0;
