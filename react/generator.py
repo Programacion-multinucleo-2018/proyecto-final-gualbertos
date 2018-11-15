@@ -39,11 +39,12 @@ def maze(width=15, height=15, complexity=.75, density=.75):
                     x, y = x_, y_
     # Third line is ending point
     # Empezar el finalX, finalY randomizado
-    finalX = 0
-    finalY = 0
-    while(Z[finalX, finalY] == 1):
-        finalX = random.randint(0, height)
-        finalY = random.randint(0, width)
+    finalX = height - 1
+    finalY = width - 1
+    print("finalX %d, finalY %d" % (finalX, finalY))
+    # while(Z[finalX, finalY] == 1):
+    #     finalX = random.randint(0, height)
+    #     finalY = random.randint(0, width)
 
     f.write("%d %d\n" %(finalX, finalY))
     for i in range(height + 1):
@@ -54,4 +55,4 @@ def maze(width=15, height=15, complexity=.75, density=.75):
     f.close()
     return Z
 
-maze(50, 50);
+maze(20, 20);

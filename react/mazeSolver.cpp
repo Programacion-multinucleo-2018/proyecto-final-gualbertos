@@ -46,7 +46,8 @@ struct Node {
     void printMe() {
         cout << endl << "x: " << x << endl;
         cout << "y: " << y << endl;
-        cout << "heuristic: " << heuristic << endl << endl;
+        cout << "heuristic: " << heuristic << endl;
+        cout << "score: " << score << endl;
     }
 };
 
@@ -92,7 +93,7 @@ void expandNodeDir(short dir, Node currentNode, short finalX, short finalY, vect
         distanceFinal = sqrt(pow(finalX - currentNode.x, 2) + pow(finalY - currentNode.y+1, 2));
         tempNode.setNode(currentNode.x, currentNode.y+1, distanceFinal, currentNode.cost + 1);
     }
-    // cout << maze(tempNode.x, tempNode.y) << endl;
+    // Checamos si el nodo ya fue visitado
     bool visitedFlag = false;
     for(int i = 0; i < closedSet.size(); i++) {
         if(closedSet[i].x == tempNode.x && closedSet[i].y == tempNode.y) {
@@ -100,10 +101,10 @@ void expandNodeDir(short dir, Node currentNode, short finalX, short finalY, vect
             break;
         }
     }
+    int index = 0;
     // Si no fue visitada y es un nodo que no ha sido ya descubierto
-    if(visitedFlag == false) {
+    if(!visitedFlag) {
         bool foundFlag = false;
-        int index = 0;
         for(int i = 0; i < openSet.size(); i++) {
             if(openSet[i].x == tempNode.x && openSet[i].y == tempNode.y) {
                 foundFlag = true;
@@ -117,14 +118,14 @@ void expandNodeDir(short dir, Node currentNode, short finalX, short finalY, vect
             string value = to_string(currentNode.x) + "-" + to_string(currentNode.y);
             cameFrom[key] = value;
         }
-        else {
-            // Si no es un nuevo descubrimiento, pero tenemos mejor score que el que 
-            // habíamos descubierto, lo actualizamos
-            if (tempNode.score < openSet[index].score) {
-                string key = to_string(tempNode.x) + "-" + to_string(tempNode.y);
-                string value = to_string(currentNode.x) + "-" + to_string(currentNode.y);
-                cameFrom[key] = value;
-            }
+    }
+    else {
+        // Si no es un nuevo descubrimiento, pero tenemos mejor score que el que 
+        // habíamos descubierto, lo actualizamos
+        if (tempNode.score < openSet[index].score) {
+            string key = to_string(tempNode.x) + "-" + to_string(tempNode.y);
+            string value = to_string(currentNode.x) + "-" + to_string(currentNode.y);
+            if (cameFrom[value] != key) cameFrom[key] = value;
         }
     }
 }
@@ -217,7 +218,6 @@ void aStarSearch(Matrix maze, short initialX, short initialY, short finalX, shor
 
         move(openSet.begin(), openSet.begin() + 1, back_inserter(closedSet));
         openSet.erase(openSet.begin());
-
         expandNode(currentNode, openSet, closedSet, cameFrom, maze, finalX, finalY);
     }
 
@@ -227,7 +227,7 @@ void aStarSearch(Matrix maze, short initialX, short initialY, short finalX, shor
         Node lowestHeuristicNode;
         lowestHeuristicNode.copyNode(closedSet[0]);
         for(int i = 1; i < closedSet.size(); i++) {
-            cout << "closedSet[i].heuristic" << closedSet[i].heuristic << endl;
+            /* cout << "closedSet[i].heuristic" << closedSet[i].heuristic << endl; */
             if (lowestHeuristicNode.heuristic > closedSet[i].heuristic) {
                 lowestHeuristicNode.copyNode(closedSet[i]);
             }
@@ -272,12 +272,12 @@ int main(int argc, char * argv[]) {
     }
 
     //Debug print
-    for(int i = 0; i < maze.rows; i++) {
-        for(int j = 0; j < maze.cols; j++) {
-            cout << maze(i, j) << " ";
-        }
-        cout << endl;
-    }
+    /* for(int i = 0; i < maze.rows; i++) { */
+    /*     for(int j = 0; j < maze.cols; j++) { */
+    /*         cout << maze(i, j) << " "; */
+    /*     } */
+    /*     cout << endl; */
+    /* } */
 
     aStarSearch(maze, initialX, initialY, finalX, finalY);
     return 0;

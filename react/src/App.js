@@ -2,8 +2,8 @@ import React from 'react';
 
 const mazeFile = 'python-generated-maze.txt';
 const solutionFile = 'solution.txt';
-const tick = 100; // ms
-const jump = 1; // steps/tick
+const tick = 200; // ms
+const jump = 3; // steps/tick
 const separator = ' ';
 
 export default class App extends React.Component {
