@@ -1,11 +1,8 @@
-/* #include <stdlib.h> */
 #include <math.h>
 #include <iostream>
 #include <fstream>
 #include <vector>
 #include <map>
-/* #include <algorithm> */
-/* #include <list> */
 
 using namespace std;
 
@@ -16,7 +13,9 @@ struct Node {
     short cost;
     float heuristic;
     float score;
+
     Node() {}
+
     Node(short x_, short y_, float heuristic_, short cost_) {
         x = x_;
         y = y_;
@@ -24,6 +23,7 @@ struct Node {
         cost = cost_;
         score = heuristic_ + cost_;
     }
+
     void setNode(short x_, short y_, float heuristic_, short cost_) {
         x = x_;
         y = y_;
@@ -31,6 +31,7 @@ struct Node {
         cost = cost_;
         score = heuristic_ + cost_;
     }
+
     // Le pasamos un nodo y lo copia a sí
     void copyNode(Node toCopy) {
         x = toCopy.x;
@@ -39,6 +40,7 @@ struct Node {
         cost = toCopy.cost;
         score = toCopy.score;
     }
+
     void printMe() {
         cout << endl << "x: " << x << endl;
         cout << "y: " << y << endl;
@@ -46,6 +48,7 @@ struct Node {
         cout << "cost: " << cost << endl;
         cout << "score: " << score << endl;
     }
+
     void updateCost(short cost_) {
         cost = cost_;
         score = heuristic + cost_;
@@ -57,10 +60,13 @@ struct Matrix {
     short rows;
     short cols;
     vector<short> data;
+
     Matrix(short rows_, short cols_):rows(rows_), cols(cols_), data(rows*cols) { }
+
     short & operator()(size_t row, size_t col) {
         return data[row*cols+col];
     } 
+
     short operator()(size_t row, size_t col) const {
         return data[row*cols+col];
     } 
@@ -101,20 +107,19 @@ void expandNode(Node currentNode, vector<Node> &openSet, vector<Node> &closedSet
     short x = currentNode.x;
     short y = currentNode.y;
     short cost = currentNode.cost + 1;
+
     // Left
     short _x = x - 1;
     short _y = y;
     checkNeighbour(tempNodes, maze, _x, _y, finalX, finalY, cost);
     // Right
     _x = x + 1;
-    _y = y;
     checkNeighbour(tempNodes, maze, _x, _y, finalX, finalY, cost);
     // Up
     _x = x;
     _y = y - 1;
     checkNeighbour(tempNodes, maze, _x, _y, finalX, finalY, cost);
     // Down
-    _x = x;
     _y = y + 1;
     checkNeighbour(tempNodes, maze, _x, _y, finalX, finalY, cost);
 
@@ -122,6 +127,7 @@ void expandNode(Node currentNode, vector<Node> &openSet, vector<Node> &closedSet
     for (int i = 0; i < tempNodes.size(); i++) {
         // Si está en el closed set, no hacemos nada con el nodo
         if (isInSet(tempNodes[i], closedSet) > -1) continue;
+
         short index = isInSet(tempNodes[i], openSet);
         if (index == -1) { // Si no está en openSet lo metemos a openSet
             openSet.push_back(tempNodes[i]);
@@ -129,6 +135,7 @@ void expandNode(Node currentNode, vector<Node> &openSet, vector<Node> &closedSet
             if (tempNodes[i].score >= currentNode.score) continue;
             openSet[index].updateCost(tempNodes[i].cost);
         }
+
         string key = to_string(tempNodes[i].x) + "-" + to_string(tempNodes[i].y);
         string value = to_string(x) + "-" + to_string(y);
         cameFrom[key] = value;
@@ -151,7 +158,7 @@ void aStarSearch(Matrix maze, short initialX, short initialY, short finalX, shor
     // If a node can be reached from many nodes, cameFrom will eventually contain the
     // most efficient previous step.
     // cameFrom := an empty map
-    // el key es el elemento y el value es de donde vino.
+    // el key es current y el value es parent
     map<string, string> cameFrom;
     string key = to_string(initialNode.x) + "-" + to_string(initialNode.y);
     cameFrom[key] = "START";
@@ -184,11 +191,10 @@ int main(int argc, char * argv[]) {
     //Tenemos por default el nombre del txt
     char * mazeText = "public/python-generated-maze.txt";
 
-    if(argc == 2) { //Si nos dieron los file names
-        mazeText = argv[1];
-    }
+    // Si nos dieron los file names
+    if(argc == 2) mazeText = argv[1];
 
-    //Abrimos el file
+    // Abrimos el file
     FILE* file_ptr = fopen(mazeText, "r");
     
     if(file_ptr == NULL) {
@@ -196,13 +202,9 @@ int main(int argc, char * argv[]) {
         exit(EXIT_FAILURE);
     }
 
-    //Inicializamos variables
+    // Inicializamos variables
     short rows, cols, initialX, initialY, finalX, finalY;
     fscanf(file_ptr, "%hu %hu %hu %hu %hu %hu", &rows, &cols, &initialX, &initialY, &finalX, &finalY);
-
-    //Debug print
-    // cout << initialX << " , " << initialY << endl;
-    // cout << finalX << " , " << finalY << endl;
 
     //Iteramos a traves de la matriz para poner los valores
     Matrix maze(rows, cols);
@@ -212,7 +214,7 @@ int main(int argc, char * argv[]) {
         }
     }
 
-    //Debug print
+    // Debug print
     /* for(int i = 0; i < maze.rows; i++) { */
     /*     for(int j = 0; j < maze.cols; j++) { */
     /*         cout << maze(i, j) << " "; */
