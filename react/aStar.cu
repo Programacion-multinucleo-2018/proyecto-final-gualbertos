@@ -131,8 +131,6 @@ void expandNode(Node currentNode, vector<Node> &openSet, vector<Node> &closedSet
     vector<Node> tempNodes;
     short x = currentNode.x;
     short y = currentNode.y;
-    short _x = x - 1;
-    short _y = y;
     short cost = currentNode.cost + 1;
     checkNeighbour(tempNodes, maze, _x, _y, finalX, finalY, cost);
     // Right
