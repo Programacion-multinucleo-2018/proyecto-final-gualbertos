@@ -264,7 +264,7 @@ int main(int argc, char * argv[]) {
 
     // Mandamos a llamar a hacer la matriz
     calcHeuristicOnGPU<<<grid, block>>>(heuristicMat, cols, rows, finalX, finalY);
-    SAFE_CALL(cudaDeviceSynchronize(), "Error executing kernel");
+    // SAFE_CALL(cudaDeviceSynchronize(), "Error executing kernel");
     
     // SAFE_CALL kernel error
     SAFE_CALL(cudaGetLastError(), "Error with last error");
@@ -277,7 +277,7 @@ int main(int argc, char * argv[]) {
     auto end_cpu =  chrono::high_resolution_clock::now();  
     chrono::duration<float, std::milli> duration_ms = end_cpu - start_cpu;
 
-    cout << "Time for Astar Search: " << duration_ms << endl;
+    cout << "Time for Astar Search: " << duration_ms.count() << endl;
 
     // free device global memory
     SAFE_CALL(cudaFree(heuristicMat), "Error freeing memory");
