@@ -93,8 +93,8 @@ void debugHeuristicMat(float *heuristicMatHost, short rows, short cols) {
     for(int i = 0; i < rows; i++ ) {
         for(int j = 0; j < cols; j++ ) {
             // cout << "x: " << j << " y: " << i  << endl;
-            // cout << "x: " << j << " y: " << i << "heuristic: " << heuristicMat[j+i*cols] << endl;
-            cout << "x: " << j << " y: " << i << "heuristic: " << heuristicMatHost[j] << endl;
+            cout << "x: " << j << " y: " << i << "heuristic: " << heuristicMat[j+i*cols] << endl;
+            /* cout << "x: " << j << " y: " << i << "heuristic: " << heuristicMatHost[j] << endl; */
         }
     }
 }
