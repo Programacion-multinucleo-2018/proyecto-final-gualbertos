@@ -84,7 +84,15 @@ __global__ void calcHeuristicOnGPU(float *heuristicMat, short rows, short cols, 
         for(int i = 0; i < rows; i++) {
             // float distance = sqrt(pow(finalX - x, 2) + pow(finalY - y, 2));
             heuristicMat[iy*cols+ix] = sqrt(pow(finalX - ix, 2) + pow(finalY - iy, 2));
-            cout << "x: " << ix << " y: " << iy << "heuristic: " << heuristicMat[iy*cols+ix] << endl;
+            // cout << "x: " << ix << " y: " << iy << "heuristic: " << heuristicMat[iy*cols+ix] << endl;
+        }
+    }
+}
+
+void debugHeuristicMat(float *heuristicMat, short rows, short cols) {
+    for(int i = 0; i < rows; i++ ) {
+        for(int j = 0; j < cols; j++ ) {
+            cout << "x: " << j << " y: " << i << "heuristic: " << heuristicMat[i][j] << endl;
         }
     }
 }
