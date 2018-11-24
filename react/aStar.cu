@@ -84,7 +84,7 @@ __global__ void calcHeuristicOnGPU(float *heuristicMat, short rows, short cols, 
         for(int i = 0; i < rows; i++) {
             // float distance = sqrt(pow(finalX - x, 2) + pow(finalY - y, 2));
             heuristicMat[iy*cols+ix] = sqrt(pow(finalX - ix, 2) + pow(finalY - iy, 2));
-            cout << "x: " << ix << " y: " << iy << "heuristic: " << heuristicMat[iy*cols+ix] << endl;
+            /* cout << "x: " << ix << " y: " << iy << "heuristic: " << heuristicMat[iy*cols+ix] << endl; */
         }
     }
 }
@@ -180,7 +180,7 @@ void aStarSearch(Matrix maze, short initialX, short initialY, short finalX, shor
     string key = to_string(initialNode.x) + "-" + to_string(initialNode.y);
     cameFrom[key] = "START";
 
-    bool foundSoultion = false;
+    bool foundSolution = false;
     while(!openSet.empty()) {
         // Sorteamos los nodos dependiendo del score
         sort(openSet.begin(), openSet.end(), sortQueue);
@@ -189,7 +189,7 @@ void aStarSearch(Matrix maze, short initialX, short initialY, short finalX, shor
         // Checamos si llegamos al goal
         if (currentNode.x == finalX && currentNode.y == finalY) {
             cout << "solution found" << endl;
-            foundSoultion = true;
+            foundSolution = true;
             ofstream myfile;
             myfile.open ("public/solution.txt");
             myfile << findPath(currentNode, cameFrom);
