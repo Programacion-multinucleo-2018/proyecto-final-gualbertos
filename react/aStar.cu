@@ -120,11 +120,6 @@ short isInSet(Node node, vector<Node> &set) {
     return -1;
 }
 
-void checkNeighbour(vector<Node> &tempNodes, Matrix maze, short x, short y, float distance, short cost) {
-    if (maze(y, x) != 1) tempNodes.push_back(*new Node(x, y, distance, cost));
-    }
-}
-
 void expandNode(Node currentNode, vector<Node> &openSet, vector<Node> &closedSet, map<string, string> &cameFrom, Matrix maze, float *heuristicMatHost) {
     vector<Node> tempNodes;
     short x = currentNode.x;
