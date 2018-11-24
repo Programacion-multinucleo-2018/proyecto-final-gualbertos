@@ -263,6 +263,7 @@ int main(int argc, char * argv[]) {
 
     // Mandamos a llamar a hacer la matriz
     calcHeuristicOnGPU<<<grid, block>>>(heuristicMat, cols, rows, finalX, finalY);
+    SAFE_CALL(cudaDeviceSynchronize(), "Error executing kernel");
 
     // SAFE_CALL kernel error
     SAFE_CALL(cudaGetLastError(), "Error with last error");
