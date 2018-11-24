@@ -92,7 +92,7 @@ __global__ void calcHeuristicOnGPU(float *heuristicMat, short rows, short cols, 
 void debugHeuristicMat(float heuristicMat, short rows, short cols) {
     for(int i = 0; i < rows; i++ ) {
         for(int j = 0; j < cols; j++ ) {
-            cout << "x: " << j << " y: " << i << "heuristic: " << heuristicMat[i][j] << endl;
+            cout << "x: " << j << " y: " << i << "heuristic: " << &heuristicMat[i][j] << endl;
         }
     }
 }
