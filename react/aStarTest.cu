@@ -1,10 +1,11 @@
+#include "common.h"
 #include <math.h>
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include <map>
-#include <algorithm>
 #include <chrono>
+#include <algorithm>
+#include <map>
 
 using namespace std;
 
@@ -74,6 +75,29 @@ struct Matrix {
     } 
 };
 
+// Funcion para calcular heuristica de la matriz
+__global__ void calcHeuristicOnGPU(float *heuristicMat, short rows, short cols, short finalX, short finalY) {
+    //Codigo de clase
+    unsigned int ix = threadIdx.x + blockIdx.x * blockDim.x;
+    unsigned int iy = threadIdx.y + blockIdx.y * blockDim.y;
+
+    if (ix < cols && iy < rows) {
+        for(int i = 0; i < rows; i++) {
+            heuristicMat[iy*cols+ix] = sqrt(pow(finalX - ix, 2) + pow(finalY - iy, 2));
+        }
+    }
+}
+
+void debugHeuristicMat(float *heuristicMatHost, short rows, short cols) {
+    for(int i = 0; i < rows; i++ ) {
+        for(int j = 0; j < cols; j++ ) {
+            // cout << "x: " << j << " y: " << i  << endl;
+            cout << "x: " << j << " y: " << i << " heuristic: " << heuristicMatHost[j+i*cols] << endl;
+            /* cout << "x: " << j << " y: " << i << "heuristic: " << heuristicMatHost[j] << endl; */
+        }
+    }
+}
+
 //Funcion para hacer el sort
 bool sortQueue (Node a, Node b) { return (a.score < b.score); }
 
@@ -97,33 +121,35 @@ short isInSet(Node node, vector<Node> &set) {
     return -1;
 }
 
-void checkNeighbour(vector<Node> &tempNodes, Matrix maze, short x, short y, short finalX, short finalY, short cost) {
-    float distance = sqrt(pow(finalX - x, 2) + pow(finalY - y, 2));
+void checkNeighbour(vector<Node> &tempNodes, Matrix maze, short x, short y, float distance, short cost) {
     if (maze(y, x) != 1) {
         tempNodes.push_back(*new Node(x, y, distance, cost));
     }
 }
 
-void expandNode(Node currentNode, vector<Node> &openSet, vector<Node> &closedSet, map<string, string> &cameFrom, Matrix maze, short finalX, short finalY) {
+void expandNode(Node currentNode, vector<Node> &openSet, vector<Node> &closedSet, map<string, string> &cameFrom, Matrix maze, short finalX, short finalY, float *heuristicMatHost) {
     vector<Node> tempNodes;
     short x = currentNode.x;
     short y = currentNode.y;
     short cost = currentNode.cost + 1;
-
     // Left
     short _x = x - 1;
     short _y = y;
-    checkNeighbour(tempNodes, maze, _x, _y, finalX, finalY, cost);
+    float distance = sqrt(pow(finalX - _x, 2) + pow(finalY - _y, 2));
+    checkNeighbour(tempNodes, maze, _x, _y, distance, cost);
     // Right
     _x = x + 1;
-    checkNeighbour(tempNodes, maze, _x, _y, finalX, finalY, cost);
+    distance = sqrt(pow(finalX - _x, 2) + pow(finalY - _y, 2));
+    checkNeighbour(tempNodes, maze, _x, _y, distance, cost);
     // Up
     _x = x;
     _y = y - 1;
-    checkNeighbour(tempNodes, maze, _x, _y, finalX, finalY, cost);
+    distance = sqrt(pow(finalX - _x, 2) + pow(finalY - _y, 2));
+    checkNeighbour(tempNodes, maze, _x, _y, distance, cost);
     // Down
     _y = y + 1;
-    checkNeighbour(tempNodes, maze, _x, _y, finalX, finalY, cost);
+    distance = sqrt(pow(finalX - _x, 2) + pow(finalY - _y, 2));
+    checkNeighbour(tempNodes, maze, _x, _y, distance, cost);
 
     // Checamos cada vecino
     for (int i = 0; i < tempNodes.size(); i++) {
@@ -144,7 +170,7 @@ void expandNode(Node currentNode, vector<Node> &openSet, vector<Node> &closedSet
     }
 }
 
-void aStarSearch(Matrix maze, short initialX, short initialY, short finalX, short finalY) {
+void aStarSearch(Matrix maze, short initialX, short initialY, short finalX, short finalY, float *heuristicMatHost) {
     vector<Node> closedSet; // Set of nodes already evaluated
 
     //Creamos el nodo inicial
@@ -165,7 +191,7 @@ void aStarSearch(Matrix maze, short initialX, short initialY, short finalX, shor
     string key = to_string(initialNode.x) + "-" + to_string(initialNode.y);
     cameFrom[key] = "START";
 
-    bool foundSoultion = false;
+    bool foundSolution = false;
     while(!openSet.empty()) {
         // Sorteamos los nodos dependiendo del score
         sort(openSet.begin(), openSet.end(), sortQueue);
@@ -174,7 +200,7 @@ void aStarSearch(Matrix maze, short initialX, short initialY, short finalX, shor
         // Checamos si llegamos al goal
         if (currentNode.x == finalX && currentNode.y == finalY) {
             cout << "solution found" << endl;
-            foundSoultion = true;
+            foundSolution = true;
             ofstream myfile;
             myfile.open ("public/solution.txt");
             myfile << findPath(currentNode, cameFrom);
@@ -184,7 +210,7 @@ void aStarSearch(Matrix maze, short initialX, short initialY, short finalX, shor
 
         move(openSet.begin(), openSet.begin() + 1, back_inserter(closedSet));
         openSet.erase(openSet.begin());
-        expandNode(currentNode, openSet, closedSet, cameFrom, maze, finalX, finalY);
+        expandNode(currentNode, openSet, closedSet, cameFrom, maze, finalX, finalY, heuristicMatHost);
     }
     cout << "End of Search" << endl;
 }
@@ -216,20 +242,64 @@ int main(int argc, char * argv[]) {
         }
     }
 
-    // Debug print
-    /* for(int i = 0; i < maze.rows; i++) { */
-    /*     for(int j = 0; j < maze.cols; j++) { */
-    /*         cout << maze(i, j) << " "; */
-    /*     } */
-    /*     cout << endl; */
-    /* } */
+    //COSAS DE CUDA -------------------------------------------
+    // set up device
+    int dev = 0;
+    cudaDeviceProp deviceProp;
+    SAFE_CALL(cudaGetDeviceProperties(&deviceProp, dev), "Error device prop");
+    printf("Using Device %d: %s\n", dev, deviceProp.name);
+    SAFE_CALL(cudaSetDevice(dev), "Error setting device");
+
+    //Bytes
+    short nxy = rows * cols;
+    float nBytes = nxy * sizeof(float);
+
+    //MALLOC para host matrix
+    float *heuristicMatHost;
+    heuristicMatHost = (float *)malloc(nBytes);
+    
+    //Memset del host matrix
+    memset(heuristicMatHost, 0, nBytes);
+
+    // Malloc and copy memory to device
+    float *heuristicMat;
+    SAFE_CALL(cudaMalloc((void **)&heuristicMat, nBytes), "Error allocating heuristicMat");
+    SAFE_CALL(cudaMemcpy(heuristicMat, heuristicMatHost, nBytes, cudaMemcpyHostToDevice), "Error copying Heuristic Mat to Device");
+
+    // invoke kernel at host side
+    int dimx = 16;
+    int dimy = 16;
+    dim3 block(dimx, dimy);
+    dim3 grid((cols + block.x - 1) / block.x, (rows + block.y - 1) / block.y);
+
+    // Mandamos a llamar a hacer la matriz
+    calcHeuristicOnGPU<<<grid, block>>>(heuristicMat, cols, rows, finalX, finalY);
+    // SAFE_CALL(cudaDeviceSynchronize(), "Error executing kernel");
+    
+    // SAFE_CALL kernel error
+    SAFE_CALL(cudaGetLastError(), "Error with last error");
+
+    // copy kernel result back to host side
+    SAFE_CALL(cudaMemcpy(heuristicMatHost, heuristicMat, nBytes, cudaMemcpyDeviceToHost), "Error copying heuristic back to host");
 
     auto start_cpu =  chrono::high_resolution_clock::now();
-    aStarSearch(maze, initialX, initialY, finalX, finalY);
+    aStarSearch(maze, initialX, initialY, finalX, finalY, heuristicMatHost);
     auto end_cpu =  chrono::high_resolution_clock::now();  
     chrono::duration<float, std::milli> duration_ms = end_cpu - start_cpu;
 
     cout << "Time for Astar Search: " << duration_ms.count() << endl;
+
+    // free device global memory
+    SAFE_CALL(cudaFree(heuristicMat), "Error freeing memory");
+
+    // debug
+    // debugHeuristicMat(heuristicMatHost, rows, cols);
+    
+    // free host memory
+    free(heuristicMatHost);
+
+    // reset device
+    SAFE_CALL(cudaDeviceReset(), "Error reseting");
 
     return 0;
 }
