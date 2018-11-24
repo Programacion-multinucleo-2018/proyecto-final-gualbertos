@@ -130,14 +130,16 @@ void checkNeighbour(vector<Node> &tempNodes, Matrix maze, short x, short y, shor
 void expandNode(Node currentNode, vector<Node> &openSet, vector<Node> &closedSet, map<string, string> &cameFrom, Matrix maze, short finalX, short finalY) {
     vector<Node> tempNodes;
     short x = currentNode.x;
+    short y = currentNode.y;
+    short _x = x - 1;
+    short _y = y;
+    short cost = currentNode.cost + 1;
+    checkNeighbour(tempNodes, maze, _x, _y, finalX, finalY, cost);
+    // Right
     short _x = x - 1;
     short _y = y;
     checkNeighbour(tempNodes, maze, _x, _y, finalX, finalY, cost);
     // Right
-    _x = x + 1;
-    checkNeighbour(tempNodes, maze, _x, _y, finalX, finalY, cost);
-    // Up
-    _x = x;
     _y = y - 1;
     checkNeighbour(tempNodes, maze, _x, _y, finalX, finalY, cost);
     // Down
