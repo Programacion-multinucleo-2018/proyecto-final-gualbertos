@@ -92,7 +92,7 @@ __global__ void calcHeuristicOnGPU(float *heuristicMat, short rows, short cols, 
 void debugHeuristicMat(float *heuristicMat, short rows, short cols) {
     for(int i = 0; i < rows; i++ ) {
         for(int j = 0; j < cols; j++ ) {
-            cout << "x: " << j << " y: " << i << "heuristic: " << heuristicMat[i][j] << endl;
+            cout << "x: " << j << " y: " << i << "heuristic: " << &heuristicMat[i][j] << endl;
         }
     }
 }
@@ -101,15 +101,6 @@ void debugHeuristicMat(float *heuristicMat, short rows, short cols) {
 bool sortQueue (Node a, Node b) { return (a.score < b.score); }
 
 string findPath(Node currentNode, map<string, string> &cameFrom) {
-    string key = to_string(currentNode.x) + "-" + to_string(currentNode.y);
-    string value = cameFrom[key];
-    string path = key + "\n";
-
-    while (value != "START") {
-        path += value + "\n";
-        key = value;
-        value = cameFrom[key];
-    }
     return path;
 }
 
