@@ -4,6 +4,7 @@
 #include <vector>
 #include <map>
 #include <algorithm>
+#include <chrono>
 
 using namespace std;
 
@@ -223,6 +224,12 @@ int main(int argc, char * argv[]) {
     /*     cout << endl; */
     /* } */
 
+    auto start_cpu =  chrono::high_resolution_clock::now();
     aStarSearch(maze, initialX, initialY, finalX, finalY);
+    auto end_cpu =  chrono::high_resolution_clock::now();  
+    chrono::duration<float, std::milli> duration_ms = end_cpu - start_cpu;
+
+    cout << "Time for Astar Search: " << duration_ms.count() << endl;
+
     return 0;
 }
