@@ -253,7 +253,7 @@ int main(int argc, char * argv[]) {
     // Malloc and copy memory to device
     float *heuristicMat;
     SAFE_CALL(cudaMalloc((void **)&heuristicMat, nBytes), "Error allocating heuristicMat");
-    // SAFE_CALL(cudaMemcpy(heuristicMat, heuristicMatHost, nBytes, cudaMemcpyHostToDevice), "Error copying Heuristic Mat to Device");
+    SAFE_CALL(cudaMemcpy(heuristicMat, heuristicMatHost, nBytes, cudaMemcpyHostToDevice), "Error copying Heuristic Mat to Device");
 
     // invoke kernel at host side
     int dimx = 16;
@@ -264,7 +264,7 @@ int main(int argc, char * argv[]) {
     // Mandamos a llamar a hacer la matriz
     calcHeuristicOnGPU<<<grid, block>>>(heuristicMat, cols, rows, finalX, finalY);
     SAFE_CALL(cudaDeviceSynchronize(), "Error executing kernel");
-
+    
     // SAFE_CALL kernel error
     SAFE_CALL(cudaGetLastError(), "Error with last error");
 
