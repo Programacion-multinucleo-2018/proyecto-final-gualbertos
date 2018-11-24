@@ -188,7 +188,7 @@ void aStarSearch(Matrix maze, short initialX, short initialY, short finalX, shor
     string key = to_string(initialNode.x) + "-" + to_string(initialNode.y);
     cameFrom[key] = "START";
 
-    bool foundSoultion = false;
+    bool foundSolution = false;
     while(!openSet.empty()) {
         // Sorteamos los nodos dependiendo del score
         sort(openSet.begin(), openSet.end(), sortQueue);
@@ -197,7 +197,7 @@ void aStarSearch(Matrix maze, short initialX, short initialY, short finalX, shor
         // Checamos si llegamos al goal
         if (currentNode.x == finalX && currentNode.y == finalY) {
             cout << "solution found" << endl;
-            foundSoultion = true;
+            foundSolution = true;
             ofstream myfile;
             myfile.open ("public/solution.txt");
             myfile << findPath(currentNode, cameFrom);
