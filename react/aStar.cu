@@ -282,6 +282,8 @@ int main(int argc, char * argv[]) {
 
     // free device global memory
     SAFE_CALL(cudaFree(heuristicMat), "Error freeing memory");
+
+    debugHeuristicMat(heuristicMat, rows, cols);
     
     // free host memory
     free(heuristicMatHost);
