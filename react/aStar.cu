@@ -73,7 +73,7 @@ struct Matrix {
 };
 
 // Funcion para calcular heuristica de la matriz
-__global__ void calcHeuristicOnGPU(float *heuristicMat, short finalX, short finalY) {
+__global__ void calcHeuristicOnGPU(float *heuristicMat, short rows, short cols, short finalX, short finalY) {
     //Codigo de clase
     unsigned int ix = threadIdx.x + blockIdx.x * blockDim.x;
     unsigned int iy = threadIdx.y + blockIdx.y * blockDim.y;
