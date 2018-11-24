@@ -271,7 +271,12 @@ int main(int argc, char * argv[]) {
     // copy kernel result back to host side
     SAFE_CALL(cudaMemcpy(heuristicMatHost, heuristicMat, nBytes, cudaMemcpyDeviceToHost), "Error copying heuristic back to host");
 
+    auto start_cpu =  chrono::high_resolution_clock::now();
     aStarSearch(maze, initialX, initialY, finalX, finalY, heuristicMatHost);
+    auto end_cpu =  chrono::high_resolution_clock::now();  
+    chrono::duration<float, std::milli> duration_ms = end_cpu - start_cpu;
+
+    cout << "Time for Astar Search: " << duration_ms << endl;
 
     // free device global memory
     SAFE_CALL(cudaFree(heuristicMat), "Error freeing memory");
