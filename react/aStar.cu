@@ -82,9 +82,7 @@ __global__ void calcHeuristicOnGPU(float *heuristicMat, short rows, short cols, 
 
     if (ix < cols && iy < rows) {
         for(int i = 0; i < rows; i++) {
-            // float distance = sqrt(pow(finalX - x, 2) + pow(finalY - y, 2));
             heuristicMat[iy*cols+ix] = sqrt(pow(finalX - ix, 2) + pow(finalY - iy, 2));
-            // cout << "x: " << ix << " y: " << iy << "heuristic: " << heuristicMat[iy*cols+ix] << endl;
         }
     }
 }
@@ -122,14 +120,12 @@ short isInSet(Node node, vector<Node> &set) {
     return -1;
 }
 
-void checkNeighbour(vector<Node> &tempNodes, Matrix maze, short x, short y, short finalX, short finalY, short cost) {
-    float distance = sqrt(pow(finalX - x, 2) + pow(finalY - y, 2));
-    if (maze(y, x) != 1) {
-        tempNodes.push_back(*new Node(x, y, distance, cost));
+void checkNeighbour(vector<Node> &tempNodes, Matrix maze, short x, short y, float distance, short cost) {
+    if (maze(y, x) != 1) tempNodes.push_back(*new Node(x, y, distance, cost));
     }
 }
 
-void expandNode(Node currentNode, vector<Node> &openSet, vector<Node> &closedSet, map<string, string> &cameFrom, Matrix maze, short finalX, short finalY) {
+void expandNode(Node currentNode, vector<Node> &openSet, vector<Node> &closedSet, map<string, string> &cameFrom, Matrix maze, float *heuristicMatHost) {
     vector<Node> tempNodes;
     short x = currentNode.x;
     short y = currentNode.y;
@@ -137,17 +133,17 @@ void expandNode(Node currentNode, vector<Node> &openSet, vector<Node> &closedSet
     // Left
     short _x = x - 1;
     short _y = y;
-    checkNeighbour(tempNodes, maze, _x, _y, finalX, finalY, cost);
+    if (maze(_y, _x) != 1) tempNodes.push_back(*new Node(_x, _y, heuristicMatHost[_x+_y*maze.cols], cost));
     // Right
     _x = x + 1;
-    checkNeighbour(tempNodes, maze, _x, _y, finalX, finalY, cost);
+    if (maze(_y, _x) != 1) tempNodes.push_back(*new Node(_x, _y, heuristicMatHost[_x+_y*maze.cols], cost));
     // Up
     _x = x;
     _y = y - 1;
-    checkNeighbour(tempNodes, maze, _x, _y, finalX, finalY, cost);
+    if (maze(_y, _x) != 1) tempNodes.push_back(*new Node(_x, _y, heuristicMatHost[_x+_y*maze.cols], cost));
     // Down
     _y = y + 1;
-    checkNeighbour(tempNodes, maze, _x, _y, finalX, finalY, cost);
+    if (maze(_y, _x) != 1) tempNodes.push_back(*new Node(_x, _y, heuristicMatHost[_x+_y*maze.cols], cost));
 
     // Checamos cada vecino
     for (int i = 0; i < tempNodes.size(); i++) {
@@ -168,7 +164,7 @@ void expandNode(Node currentNode, vector<Node> &openSet, vector<Node> &closedSet
     }
 }
 
-void aStarSearch(Matrix maze, short initialX, short initialY, short finalX, short finalY) {
+void aStarSearch(Matrix maze, short initialX, short initialY, short finalX, short finalY, float *heuristicMatHost) {
     vector<Node> closedSet; // Set of nodes already evaluated
 
     //Creamos el nodo inicial
@@ -208,7 +204,7 @@ void aStarSearch(Matrix maze, short initialX, short initialY, short finalX, shor
 
         move(openSet.begin(), openSet.begin() + 1, back_inserter(closedSet));
         openSet.erase(openSet.begin());
-        expandNode(currentNode, openSet, closedSet, cameFrom, maze, finalX, finalY);
+        expandNode(currentNode, openSet, closedSet, cameFrom, maze, heuristicMatHost);
     }
     cout << "End of Search" << endl;
 }
@@ -280,12 +276,13 @@ int main(int argc, char * argv[]) {
     // copy kernel result back to host side
     SAFE_CALL(cudaMemcpy(heuristicMatHost, heuristicMat, nBytes, cudaMemcpyDeviceToHost), "Error copying heuristic back to host");
 
-    // aStarSearch(maze, initialX, initialY, finalX, finalY, heuristicMatHost);
+    aStarSearch(maze, initialX, initialY, finalX, finalY, heuristicMatHost);
 
     // free device global memory
     SAFE_CALL(cudaFree(heuristicMat), "Error freeing memory");
 
-    debugHeuristicMat(heuristicMatHost, rows, cols);
+    // debug
+    // debugHeuristicMat(heuristicMatHost, rows, cols);
     
     // free host memory
     free(heuristicMatHost);
