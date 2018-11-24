@@ -139,7 +139,8 @@ void expandNode(Node currentNode, vector<Node> &openSet, vector<Node> &closedSet
     // Right
     _x = x + 1;
     checkNeighbour(tempNodes, maze, _x, _y, finalX, finalY, cost);
-    // Right
+    // Up
+    _x = x;
     _y = y - 1;
     checkNeighbour(tempNodes, maze, _x, _y, finalX, finalY, cost);
     // Down
