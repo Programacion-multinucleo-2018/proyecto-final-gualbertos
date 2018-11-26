@@ -56,4 +56,4 @@ def maze(width=15, height=15, complexity=.75, density=.75):
     f.close()
     return Z
 
-maze(200, 200);
+maze(800, 800);
